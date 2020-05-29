@@ -6,6 +6,7 @@ class Demo(object):
     def __init__(self, observations, random_seed=None):
         self._observations = observations
         self.random_seed = random_seed
+        self.segment_indices = []
 
     def __len__(self):
         return len(self._observations)

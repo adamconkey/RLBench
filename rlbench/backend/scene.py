@@ -277,11 +277,13 @@ class Scene(object):
                 'No waypoints were found.', self._active_task)
 
         demo = []
+        segment_indices = []
         if record:
             self._pyrep.step()  # Need this here or get_force doesn't work...
             demo.append(self.get_observation())
         while True:
             success = False
+            # segment_indices = []
             for i, point in enumerate(waypoints):
 
                 point.start_of_path()
@@ -358,6 +360,9 @@ class Scene(object):
 
                     self._demo_record_step(demo, record, func)
 
+                # Tracking when in the demo each waypoint was achieved for task segmentation
+                segment_indices.append(len(demo))
+                    
             if not self._active_task.should_repeat_waypoints() or success:
                 break
 
@@ -376,7 +381,9 @@ class Scene(object):
         if not success:
             raise DemoError('Demo was completed, but was not successful.',
                             self._active_task)
-        return Demo(demo)
+        demo = Demo(demo)
+        demo.segment_indices = segment_indices
+        return demo
 
     def get_observation_config(self) -> ObservationConfig:
         return self._obs_config
